@@ -2,6 +2,8 @@ package com.dazao.schoolclubbackend.config;
 
 
 import com.dazao.schoolclubbackend.entity.RestBean;
+import com.dazao.schoolclubbackend.entity.security.MyUserDetails;
+import com.dazao.schoolclubbackend.entity.vo.AuthorizeVo;
 import com.dazao.schoolclubbackend.filter.JwtFilter;
 import com.dazao.schoolclubbackend.utils.JwtUtil;
 import jakarta.annotation.Resource;
@@ -14,7 +16,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -27,6 +31,10 @@ public class SecurityConfig {
     JwtUtil jwtUtil;
     @Resource
     JwtFilter jwtFilter;
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.authorizeHttpRequests(config-> config
@@ -73,13 +81,20 @@ public class SecurityConfig {
                                      HttpServletResponse httpServletResponse,
                                      Authentication authentication) throws IOException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
-        User user = (User) authentication.getPrincipal();
+        MyUserDetails user = (MyUserDetails) authentication.getPrincipal();
         PrintWriter writer = httpServletResponse.getWriter();
+        String token = jwtUtil.createJwt(user, user.getUserId(), user.getUsername());
+        AuthorizeVo authorizeVo = new AuthorizeVo()
+                .setToken(token)
+                .setRole(user.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority).toList().toString())
+                .setUsername(user.getUsername())
+                .setExpireTime(jwtUtil.expireTime());
         writer
-                .write(RestBean.success(jwtUtil.createJwt(user, 1, "小明"),"登录成功")
+                .write(RestBean.success(authorizeVo,"登录成功")
                 .asJsonString());
         writer.close();
     }
-
 
 }
