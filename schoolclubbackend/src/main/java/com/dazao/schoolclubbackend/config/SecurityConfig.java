@@ -2,6 +2,9 @@ package com.dazao.schoolclubbackend.config;
 
 
 import com.dazao.schoolclubbackend.entity.RestBean;
+import com.dazao.schoolclubbackend.filter.JwtFilter;
+import com.dazao.schoolclubbackend.utils.JwtUtil;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -11,13 +14,19 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Configuration
 public class SecurityConfig {
-
+    @Resource
+    JwtUtil jwtUtil;
+    @Resource
+    JwtFilter jwtFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.authorizeHttpRequests(config-> config
@@ -33,6 +42,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(this::accessDeniedHandler))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -41,14 +51,14 @@ public class SecurityConfig {
                                       Authentication authentication) throws IOException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
         httpServletResponse.getWriter().write(RestBean.success("登出成功").asJsonString());
+
     }
 
     private void accessDeniedHandler(HttpServletRequest httpServletRequest,
                                      HttpServletResponse httpServletResponse,
                                      AuthenticationException e) throws IOException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
-        httpServletResponse.setStatus(403);
-        httpServletResponse.getWriter().write(RestBean.failure(403,"未登录,清重新登录").asJsonString());
+        httpServletResponse.getWriter().write(RestBean.failure(401,"未登录,清重新登录").asJsonString());
     }
 
 
@@ -63,7 +73,12 @@ public class SecurityConfig {
                                      HttpServletResponse httpServletResponse,
                                      Authentication authentication) throws IOException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
-        httpServletResponse.getWriter().write(RestBean.success("登录成功").asJsonString());
+        User user = (User) authentication.getPrincipal();
+        PrintWriter writer = httpServletResponse.getWriter();
+        writer
+                .write(RestBean.success(jwtUtil.createJwt(user, 1, "小明"),"登录成功")
+                .asJsonString());
+        writer.close();
     }
 
 

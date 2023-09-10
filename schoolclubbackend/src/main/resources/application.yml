@@ -6,3 +6,6 @@ spring:
     url: rm-2ze936157744v8bl59o.mysql.rds.aliyuncs.com/schoolclub
     username: dazao
     password: Asd2003828
+  security:
+    key: dazaoabc
+    expire: 7

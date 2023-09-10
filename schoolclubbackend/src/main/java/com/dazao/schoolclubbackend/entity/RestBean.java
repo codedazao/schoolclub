@@ -13,6 +13,9 @@ public record RestBean<T>(int code, T data , String message) {
     public static <T> RestBean<T> success(){
         return success(null);
     }
+    public static <T> RestBean<T> success(T data,String message){
+        return new RestBean<>(200,data,message);
+    }
 
     public static <T> RestBean<T> failure(int code,String message){
         return new RestBean<>(code,null,message);
