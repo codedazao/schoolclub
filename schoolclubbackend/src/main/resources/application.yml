@@ -3,9 +3,10 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: rm-2ze936157744v8bl59o.mysql.rds.aliyuncs.com/schoolclub
+#      url: jdbc:mysql://rm-2ze936157744v8bl59o.mysql.rds.aliyuncs.com:3306/schoolclub
     username: dazao
     password: Asd2003828
+    url: jdbc:mysql://rm-2ze936157744v8bl59o.mysql.rds.aliyuncs.com:3306/schoolclub
   security:
     key: dazaoabc
     expire: 7
