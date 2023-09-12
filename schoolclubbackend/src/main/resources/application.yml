@@ -11,6 +11,6 @@ spring:
     expire: 7
   data:
     redis:
-      url: redis://r-2zehb42aq37efq775ppd.redis.rds.aliyuncs.com:6379
       database: 8
       password: Asd2003828
+      host: r-2zehb42aq37efq775ppd.redis.rds.aliyuncs.com

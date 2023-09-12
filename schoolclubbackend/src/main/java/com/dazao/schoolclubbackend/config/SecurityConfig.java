@@ -58,8 +58,14 @@ public class SecurityConfig {
                                       HttpServletResponse httpServletResponse,
                                       Authentication authentication) throws IOException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
-        httpServletResponse.getWriter().write(RestBean.success("登出成功").asJsonString());
-
+        String headerToken = httpServletRequest.getHeader("Authorization");
+        boolean invalidated = jwtUtil.invalidateJwt(headerToken);
+        PrintWriter writer = httpServletResponse.getWriter();
+        if (!invalidated){
+            writer.write(RestBean.failure(400,"退出登录失败").asJsonString());
+        }else {
+            writer.write(RestBean.success("登出成功").asJsonString());
+        }
     }
 
     private void accessDeniedHandler(HttpServletRequest httpServletRequest,

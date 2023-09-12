@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtUtil {
@@ -36,22 +37,36 @@ public class JwtUtil {
         Algorithm algorithm = Algorithm.HMAC256(key);
         JWTVerifier jwtVerifier = JWT.require(algorithm).build();
         try {
-            DecodedJWT verify = jwtVerifier.verify(headerToken);
-            String jwtId = verify.getId();
-        } catch (JWTVerificationException e){
-           return false;
+            DecodedJWT decodedJWT = jwtVerifier.verify(jwtString);
+            String jwtId = decodedJWT.getId();
+            return deleteToken(jwtId, decodedJWT.getExpiresAt());
+        } catch (JWTVerificationException e) {
+            return false;
         }
-        //为了防止报错改的
-        return true;
     }
 
     //token存入黑名单
     private boolean deleteToken(String uuid, Date time) {
-        stringRedisTemplate.hasKey(Const.JWT_BLACK_LIST+uuid);
-        //防止报错的
-        return true;
+        //time是现在传入的时间（现在的时间）
+        //token没在redis中
+        if (!this.isInvalidToken(uuid)){
+            Date now = new Date();
+            long expireTime = time.getTime() - now.getTime();
+            long timeForRedis = Math.max(expireTime, 0);
+            stringRedisTemplate.opsForValue().set(Const.JWT_BLACK_LIST + uuid,
+                    "",
+                    timeForRedis,
+                    TimeUnit.MILLISECONDS);
+            System.out.println(stringRedisTemplate.opsForValue().get(Const.JWT_BLACK_LIST + uuid));
+            return true;
+        }else {
+            return false;
+        }
     }
 
+    private boolean isInvalidToken(String uuid){
+        return Boolean.TRUE.equals(stringRedisTemplate.hasKey(Const.JWT_BLACK_LIST + uuid));
+    }
 
     //解析jwt
     public DecodedJWT resolveJwt(String headerToken) {
@@ -62,6 +77,10 @@ public class JwtUtil {
         JWTVerifier jwtVerifier = JWT.require(algorithm).build();
         try {
             DecodedJWT verify = jwtVerifier.verify(stringJwt);
+            //看一看token有没有被拉黑
+            if (this.isInvalidToken(verify.getId())) {
+                return null;
+            }
             Date expireTime = verify.getExpiresAt();
             return new Date().after(expireTime) ? null : verify;
         } catch (JWTVerificationException e) {
