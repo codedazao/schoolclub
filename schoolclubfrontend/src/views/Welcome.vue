@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <router-view></router-view>
+  我是欢迎页面
 </template>
 
 <style scoped>
