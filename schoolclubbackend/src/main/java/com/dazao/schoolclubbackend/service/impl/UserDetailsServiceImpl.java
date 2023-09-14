@@ -1,6 +1,5 @@
 package com.dazao.schoolclubbackend.service.impl;
 
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.dazao.schoolclubbackend.entity.Account;
 import com.dazao.schoolclubbackend.entity.security.MyUserDetails;
 import com.dazao.schoolclubbackend.service.AccountService;
