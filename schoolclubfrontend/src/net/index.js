@@ -51,7 +51,7 @@ function internalPost(url, data, header, success, failure, error) {
     axios.post(url, data, {
         headers: header
     }).then((data) => {
-        console.log(data)
+            // console.log(data)
             if (data.data.code === 200) {
                 success(data)
             } else {
@@ -95,9 +95,10 @@ function login(username, password, remember, success, failure = defaultFailure) 
             'Content-Type':'application/x-www-form-urlencoded'
         },
         (data)=>{
-            console.log(data.data.token,data.data.expireTime)
-            storeAccessToken(data.data.token, data.data.expireTime, remember)
-            ElMessage.success(`登录成功,欢迎${data.data.username}来到我们的系统`)
+            // console.log(data.data)
+            // console.log(data.data.data.token,data.data.data.expireTime)
+            storeAccessToken(data.data.data.token, data.data.data.expireTime, remember)
+            ElMessage.success(`登录成功,欢迎${data.data.data.username}来到我们的系统`)
             success(data)
         }, failure,
         defaultError

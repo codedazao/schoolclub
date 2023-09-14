@@ -25,7 +25,6 @@ const rule = {
 }
 
 function userLogin() {
-  console.log(formRef)
   formRef.value.validate((valid)=>{
     if (valid){
       login(form.username,form.password,form.remember,()=>{

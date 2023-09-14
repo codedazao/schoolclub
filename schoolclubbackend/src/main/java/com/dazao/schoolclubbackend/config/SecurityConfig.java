@@ -80,7 +80,7 @@ public class SecurityConfig {
                                      HttpServletResponse httpServletResponse,
                                      AuthenticationException e) throws IOException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
-        httpServletResponse.getWriter().write(RestBean.failure(401,"登录失败").asJsonString());
+        httpServletResponse.getWriter().write(RestBean.failure(401,"登录失败,用户名或密码错误").asJsonString());
     }
 
     private void successLoginHandler(HttpServletRequest httpServletRequest,
