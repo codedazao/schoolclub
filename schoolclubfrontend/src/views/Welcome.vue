@@ -9,7 +9,6 @@ import '@/assets/main.css'
                 height: 100%;"
                 fit="cover"
                 src="https://itbaima.net/static/image/background/light/1.webp">
-
       </el-image>
     </div>
     <div class="right-card">
