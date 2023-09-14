@@ -34,6 +34,7 @@ function deleteAccessToken(){
 }
 
 function storeAccessToken(token,expireTime,remember){
+    console.log(token,expireTime,remember)
     const authObj = {
         token:token,
         expire:expireTime
@@ -78,9 +79,9 @@ function internalGet(url, data, header, success, failure, error) {
 //     "code": 200,
 //     "data": {
 //     "expireTime": "2023-09-21 09:34:40.259",
-//         "role": "[user]",
-//         "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiZGF6YW8iLCJpZCI6MSwiZXhwIjoxNjk1MjYwMDgwLCJqdGkiOiIwMGY0OTg1Mi03ODUyLTQ4MTctYWQ4Yi0zMWU0N2E3ZmZmZWYiLCJhdXRob3JpdGllcyI6WyJ1c2VyIl19.9-p8qwY2uoqPLp0bXfXHJmTIzSIR-P4B1gHmLAU0hyE",
-//         "username": "dazao"
+//     "role": "[user]",
+//     "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiZGF6YW8iLCJpZCI6MSwiZXhwIjoxNjk1MjYwMDgwLCJqdGkiOiIwMGY0OTg1Mi03ODUyLTQ4MTctYWQ4Yi0zMWU0N2E3ZmZmZWYiLCJhdXRob3JpdGllcyI6WyJ1c2VyIl19.9-p8qwY2uoqPLp0bXfXHJmTIzSIR-P4B1gHmLAU0hyE",
+//     "username": "dazao"
 // },
 //     "message": "登录成功"
 // }
@@ -94,7 +95,7 @@ function login(username, password, remember, success, failure = defaultFailure) 
             'Content-Type':'application/x-www-form-urlencoded'
         },
         (data)=>{
-            console.log(data)
+            console.log(data.data.token,data.data.expireTime)
             storeAccessToken(data.data.token, data.data.expireTime, remember)
             ElMessage.success(`登录成功,欢迎${data.data.username}来到我们的系统`)
             success(data)
