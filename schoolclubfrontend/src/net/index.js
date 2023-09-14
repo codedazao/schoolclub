@@ -3,6 +3,7 @@ import {ElMessage} from "element-plus";
 
 
 const authItemName = "access_token"
+
 const defaultFailure = (message, code, url) => {
     //给开发人员看的
     console.error(`请求地址:${url},状态码:${code},控制信息:${message}`)
@@ -18,8 +19,11 @@ function takeAccessToken(){
     const authStr = localStorage.getItem(authItemName)||sessionStorage.getItem(authItemName)
     if (authStr === null) return null
     const authObj = JSON.parse(authStr)
-    if (authStr.expire <= new Date())
+    if (authStr.expire <= new Date()){
         deleteAccessToken()
+        ElMessage.warning("登录状态已过期，请重新登录")
+        return null
+    }
     return authObj
 }
 
@@ -29,9 +33,12 @@ function deleteAccessToken(){
     sessionStorage.removeItem(authItemName)
 }
 
-function storeAccessToken(token,expire,remember){
-    const authObj = {token:token,expire:expire}
-    var authStr = JSON.stringify(authObj);
+function storeAccessToken(token,expireTime,remember){
+    const authObj = {
+        token:token,
+        expire:expireTime
+    }
+    const authStr = JSON.stringify(authObj);
     if (remember)
         localStorage.setItem(authItemName,authStr)
     else
@@ -43,10 +50,11 @@ function internalPost(url, data, header, success, failure, error) {
     axios.post(url, data, {
         headers: header
     }).then((data) => {
-            if (data.code === 200) {
-                success(data.data)
+        console.log(data)
+            if (data.data.code === 200) {
+                success(data)
             } else {
-                failure(data.message, data.code, url)
+                failure(data.data.message, data.data.code, url)
             }
         }
     ).catch((err) => error(err))
@@ -83,13 +91,13 @@ function login(username, password, remember, success, failure = defaultFailure) 
             username: username,
             password: password
         },{
-            'Content-Type':'application/x-www-form-urldecoded'
+            'Content-Type':'application/x-www-form-urlencoded'
         },
         (data)=>{
-            storeAccessToken(data.data.token,data.data.expire,remember)
+            console.log(data)
+            storeAccessToken(data.data.token, data.data.expireTime, remember)
             ElMessage.success(`登录成功,欢迎${data.data.username}来到我们的系统`)
             success(data)
-
         }, failure,
         defaultError
     )

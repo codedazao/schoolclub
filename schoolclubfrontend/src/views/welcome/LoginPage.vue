@@ -3,6 +3,7 @@ import {reactive, ref, onMounted} from "vue";
 import {Lock, User} from "@element-plus/icons-vue"
 import {login} from "@/net";
 
+
 const formRef = ref();
 
 
@@ -28,7 +29,7 @@ function userLogin() {
   formRef.value.validate((valid)=>{
     if (valid){
       login(form.username,form.password,form.remember,()=>{
-        console.log("")
+        console.log("登录操作")
       })
     }
   })

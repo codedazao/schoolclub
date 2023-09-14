@@ -10,6 +10,8 @@ spring:
   security:
     key: dazaoabc
     expire: 7
+    filter:
+      order: -100
   data:
     redis:
       database: 8
