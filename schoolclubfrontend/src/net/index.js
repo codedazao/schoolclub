@@ -15,11 +15,11 @@ const defaultError = (err) => {
     ElMessage.warning('发生了一些错误，请联系管理员')
 }
 
-function takeAccessToken(){
-    const authStr = localStorage.getItem(authItemName)||sessionStorage.getItem(authItemName)
+function takeAccessToken() {
+    const authStr = localStorage.getItem(authItemName) || sessionStorage.getItem(authItemName)
     if (authStr === null) return null
     const authObj = JSON.parse(authStr)
-    if (authStr.expire <= new Date()){
+    if (authStr.expire <= new Date()) {
         deleteAccessToken()
         ElMessage.warning("登录状态已过期，请重新登录")
         return null
@@ -27,23 +27,34 @@ function takeAccessToken(){
     return authObj
 }
 
+
+//获取需要登录接口的请求头信息，可以访问需要登录的接口
+function accessHeader() {
+    const token = takeAccessToken()
+    console.log(token)
+    return token ? {
+        'Authorization':`Baerer ${token.token}`
+    } : null
+}
+
+
 //删除内存中的token
-function deleteAccessToken(){
+function deleteAccessToken() {
     localStorage.removeItem(authItemName)
     sessionStorage.removeItem(authItemName)
 }
 
-function storeAccessToken(token,expireTime,remember){
-    console.log(token,expireTime,remember)
+function storeAccessToken(token, expireTime, remember) {
+    console.log(token, expireTime, remember)
     const authObj = {
-        token:token,
-        expire:expireTime
+        token: token,
+        expire: expireTime
     }
     const authStr = JSON.stringify(authObj);
     if (remember)
-        localStorage.setItem(authItemName,authStr)
+        localStorage.setItem(authItemName, authStr)
     else
-        sessionStorage.setItem(authItemName,authStr)
+        sessionStorage.setItem(authItemName, authStr)
 }
 
 
@@ -61,17 +72,28 @@ function internalPost(url, data, header, success, failure, error) {
     ).catch((err) => error(err))
 }
 
-function internalGet(url, data, header, success, failure, error) {
-    axios.get(url, data, {
+function internalGet(url, header, success, failure, error) {
+    axios.get(url, {
         headers: header
     }).then((data) => {
-            if (data.code === 200) {
+        console.log(data.data.code)
+            if (data.data.code === 200) {
                 success(data.data)
             } else {
-                failure(data.message, data.code, url)
+                failure(data.data.message, data.data.code, url)
             }
         }
     ).catch((err) => error(err))
+}
+
+//暴露给外面用的get方法(带token的)
+function get(url, success, failure) {
+    internalGet(url, accessHeader(), success, failure, defaultError)
+}
+
+
+function post(url, data, success, failure, error = defaultError) {
+    internalPost(url, data, accessHeader(), success, failure, error)
 }
 
 //登录接口
@@ -91,10 +113,10 @@ function login(username, password, remember, success, failure = defaultFailure) 
         '/api/auth/login', {
             username: username,
             password: password
-        },{
-            'Content-Type':'application/x-www-form-urlencoded'
+        }, {
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        (data)=>{
+        (data) => {
             // console.log(data.data)
             // console.log(data.data.data.token,data.data.data.expireTime)
             storeAccessToken(data.data.data.token, data.data.data.expireTime, remember)
@@ -105,4 +127,19 @@ function login(username, password, remember, success, failure = defaultFailure) 
     )
 }
 
-export {login}
+//给外面用的退出登录的方法
+function logout(success, failure = defaultFailure) {
+    get("/api/logout",
+        (data) => {
+            deleteAccessToken()
+            ElMessage.success("退出登录成功，欢迎您再次使用！")
+            success(data.data)
+        }, failure)
+}
+
+//用于验证用户是否登录的方法
+function unauthorized(){
+ return !takeAccessToken()
+}
+
+export {login, logout, get, post,unauthorized}
