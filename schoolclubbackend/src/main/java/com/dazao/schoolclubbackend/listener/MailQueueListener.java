@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-@RabbitListener(queues = "mail")
+@RabbitListener(queues = "email")
 public class MailQueueListener {
     @Resource
     JavaMailSender javaMailSender;
@@ -23,6 +23,7 @@ public class MailQueueListener {
 
     @RabbitHandler
     public void sendMailMessage(Map<String,Object> data){
+        System.out.println("消费");
         String email = (String) data.get("email");
         Integer code = (Integer)data.get("code");
         String type = (String)data.get("type");
