@@ -31,7 +31,6 @@ function takeAccessToken() {
 //获取需要登录接口的请求头信息，可以访问需要登录的接口
 function accessHeader() {
     const token = takeAccessToken()
-    console.log(token)
     return token ? {
         'Authorization':`Baerer ${token.token}`
     } : null
@@ -76,7 +75,6 @@ function internalGet(url, header, success, failure, error) {
     axios.get(url, {
         headers: header
     }).then((data) => {
-        console.log(data.data.code)
             if (data.data.code === 200) {
                 success(data.data)
             } else {

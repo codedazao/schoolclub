@@ -1,6 +1,20 @@
 server:
   port: 8080
 spring:
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 2995332268@qq.com
+    password: xeipxwcllzekddca
+    default-encoding: utf-8
+    protocol: smtps
+    limitTime: 60 #邮件发送的限流时长
+  rabbitmq:
+    username: admin
+    password: admin
+    host: 43.248.191.29
+    virtual-host: /
+    port: 7008
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
 #      url: jdbc:mysql://rm-2ze936157744v8bl59o.mysql.rds.aliyuncs.com:3306/schoolclub
