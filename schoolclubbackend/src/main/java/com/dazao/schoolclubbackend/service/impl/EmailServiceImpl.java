@@ -40,7 +40,7 @@ public class EmailServiceImpl implements EmailService {
             Map<String,Object> data = Map.of("type",type,"code",code,"email",email);
             amqpTemplate.convertAndSend("email",data);
             stringRedisTemplate.opsForValue().set(
-                    new StringBuilder().append(Const.VERIFY_EMAIL_DATA).append(email).toString(),
+                    Const.VERIFY_EMAIL_DATA + email,
                     String.valueOf(code),5, TimeUnit.MINUTES
             );
             return null;

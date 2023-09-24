@@ -38,7 +38,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.authorizeHttpRequests(config-> config
-                .requestMatchers("/api/auth/login","/api/auth/askcode")
+                .requestMatchers("/api/auth/login","/api/auth/ask-code","/user/register")
                 .permitAll()
                 .anyRequest()
                 .authenticated())
