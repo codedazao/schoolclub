@@ -38,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
             Random random = new Random();
             int code = random.nextInt(899999) + 100000;
             Map<String,Object> data = Map.of("type",type,"code",code,"email",email);
-            amqpTemplate.convertAndSend("mail",data);
+            amqpTemplate.convertAndSend("email",data);
             stringRedisTemplate.opsForValue().set(
                     Const.VERIFY_EMAIL_DATA + email,
                     String.valueOf(code),5, TimeUnit.MINUTES

@@ -1,8 +1,11 @@
 package com.dazao.schoolclubbackend.listener;
 
 import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,8 +14,11 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-@RabbitListener(queues = "email")
+//不管是否消费成功均不重试
+@RabbitListener(queues = "email",ackMode = "NONE")
 public class MailQueueListener {
+    private static final Logger logger = LoggerFactory.getLogger(MailQueueListener.class);
+
     @Resource
     JavaMailSender javaMailSender;
     /**
@@ -23,20 +29,24 @@ public class MailQueueListener {
 
     @RabbitHandler
     public void sendMailMessage(Map<String,Object> data){
-        System.out.println("消费");
-        String email = (String) data.get("email");
-        Integer code = (Integer)data.get("code");
-        String type = (String)data.get("type");
-        SimpleMailMessage simpleMailMessage = switch (type) {
-            case "register" -> createMessage("欢迎注册我们的网站",
-                    "您的邮件注册验证码为:" + code + "有效时间为3分钟,为了保证您的安全，请勿将验证码泄漏给别人,如不是您本人操作，请忽略",
-                    email);
-            case "resetpassword" -> createMessage("您的密码重置邮件","您好，您正在进行密码重置操作，验证码为"+code+"如非本人操作，请忽略",
-                    email);
-            default -> null;
-        };
-        if (simpleMailMessage != null)
-            javaMailSender.send(simpleMailMessage);
+        try {
+            System.out.println("消费");
+            String email = (String) data.get("email");
+            Integer code = (Integer)data.get("code");
+            String type = (String)data.get("type");
+            SimpleMailMessage simpleMailMessage = switch (type) {
+                case "register" -> createMessage("欢迎注册我们的网站",
+                        "您的邮件注册验证码为:" + code + "有效时间为3分钟,为了保证您的安全，请勿将验证码泄漏给别人,如不是您本人操作，请忽略",
+                        email);
+                case "resetpassword" -> createMessage("您的密码重置邮件","您好，您正在进行密码重置操作，验证码为"+code+"如非本人操作，请忽略",
+                        email);
+                default -> null;
+            };
+            if (simpleMailMessage != null)
+                javaMailSender.send(simpleMailMessage);
+        } catch (ListenerExecutionFailedException e) {
+            e.printStackTrace();
+        }
     }
 
 
