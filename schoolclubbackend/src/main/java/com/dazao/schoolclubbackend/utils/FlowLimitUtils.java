@@ -19,7 +19,7 @@ public class FlowLimitUtils {
      */
     public boolean limitOnceCheck(String limitKey, int blockTime) {
         synchronized (limitKey.intern()) {
-            if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(limitKey))) {
+            if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(Const.VERIFY_EMAIL_LIMIT+limitKey))) {
                 return false;
             } else {
                 stringRedisTemplate.opsForValue().set(new StringBuilder()

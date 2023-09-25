@@ -13,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Account {
     @TableId(type = IdType.AUTO)
-    int id;
+    Integer id;
     String username;
     String password;
     String email;
