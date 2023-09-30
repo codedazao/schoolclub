@@ -14,7 +14,7 @@ spring:
     password: admin
     host: 43.248.191.29
     virtual-host: /
-    port: 7008
+    port: 31753
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
 #      url: jdbc:mysql://rm-2ze936157744v8bl59o.mysql.rds.aliyuncs.com:3306/schoolclub
@@ -29,5 +29,6 @@ spring:
   data:
     redis:
       database: 8
-      password: Asd2003828
-      host: r-2zehb42aq37efq775ppd.redis.rds.aliyuncs.com
+#      password: Asd2003828
+      host: 43.248.191.29
+      port: 41599

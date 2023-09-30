@@ -12,5 +12,4 @@ public class AuthorizeVo {
     String role;
     String token;
     String username;
-
 }
