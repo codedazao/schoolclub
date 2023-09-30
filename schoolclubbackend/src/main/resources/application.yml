@@ -5,7 +5,7 @@ spring:
     host: smtp.qq.com
     port: 465
     username: 2995332268@qq.com
-    password: xeipxwcllzekddca
+    password: xeipxwcllzekddca #xeipxwcllzekddca
     default-encoding: utf-8
     protocol: smtps
     limitTime: 60 #邮件发送的限流时长
